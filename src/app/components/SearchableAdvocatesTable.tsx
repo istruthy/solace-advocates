@@ -122,13 +122,10 @@ export default function SearchableAdvocatesTable({
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-[#285e50]/10 h-10 border-b border-gray-300 text-[#285e50]">
-                <TableHeader>First</TableHeader>
-                <TableHeader>Last</TableHeader>
-                <TableHeader>City</TableHeader>
-                <TableHeader>Degree</TableHeader>
+                <TableHeader textAlign="text-left" widthClass="w-[20%]">Advocate</TableHeader>
                 <TableHeader>Specialties</TableHeader>
                 <TableHeader>Experience</TableHeader>
-                <TableHeader>Contact</TableHeader>
+                <TableHeader widthClass="w-[12%]">Contact</TableHeader>
               </tr>
             </thead>
             <tbody>
@@ -137,10 +134,16 @@ export default function SearchableAdvocatesTable({
                   key={advocate.id}
                   className="hover:bg-gray-50 border-b border-gray-200"
                 >
-                  <TableRow>{advocate.firstName}</TableRow>
-                  <TableRow>{advocate.lastName}</TableRow>
-                  <TableRow>{advocate.city}</TableRow>
-                  <TableRow>{advocate.degree}</TableRow>
+                  <TableRow>
+                    <div className="space-y-1">
+                      <div className="font-medium text-gray-900">
+                        {advocate.firstName} {advocate.lastName}, {advocate.degree}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {advocate.city}
+                      </div>
+                    </div>
+                  </TableRow>
                   <TableRow>
                     <div className="flex flex-wrap gap-1">
                       {advocate.specialties.map((specialty, index) => (
