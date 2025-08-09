@@ -10,7 +10,7 @@ The Favorites side sheet doesn't actually save anything or have the ability to a
 
 ## UI
 
-- [ ] Cosolidated advocates information
+- [x] Cosolidated advocates information
 - [x] Added filters rather table sorting
 - [x] Add a favorites selection
 - [x] Initial stab at color pallete matching with live Solace Health website
