@@ -89,7 +89,6 @@ export const SearchBar = ({
     timeoutRef.current = setTimeout(() => {
       if (!mountedRef.current) return;
 
-
       if (mountedRef.current) {
         setIsSearching(false);
       }
@@ -106,7 +105,7 @@ export const SearchBar = ({
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newTerm = event.target.value;
-    
+
     if (onSearchChange) {
       onSearchChange(newTerm);
     } else if (onSearchTermChange) {
@@ -153,7 +152,7 @@ export const SearchBar = ({
         <input
           type="text"
           placeholder="Search for your advocate"
-          className="border border-gray-300 rounded px-3 py-2 flex-1"
+          className="border border-gray-300 rounded focus:ring-[#285050] focus:border-[#285050] px-3 py-2 flex-1"
           value={searchTerm}
           onChange={handleSearchChange}
         />

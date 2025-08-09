@@ -1,5 +1,6 @@
 import { Advocate } from "@/types/advocate";
-import { config } from "./config";
+
+const apiUrl = "http://localhost:3000";
 
 const createErrorResponse = (
   page: number,
@@ -58,7 +59,7 @@ export const getAdvocates = async (
     }
 
     const response = await fetch(
-      `${config.apiUrl}/api/advocates?${params.toString()}`
+      `${apiUrl}/api/advocates?${params.toString()}`
     );
 
     if (!response.ok) {
