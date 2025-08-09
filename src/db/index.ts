@@ -13,9 +13,12 @@ const setup = () => {
       }),
     };
   }
-// suggested by ai review
+// suggested by ai review after stress testing connction to db
   try {
-    const queryClient = postgres(process.env.DATABASE_URL);
+    const queryClient = postgres(process.env.DATABASE_URL, {
+      max: 10, 
+      connect_timeout: 10, 
+    });
     const db = drizzle(queryClient);
     return db;
   } catch (error) {

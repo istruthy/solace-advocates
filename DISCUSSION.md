@@ -2,6 +2,11 @@
 
 Thanks for the opportunity to work through this example project. Within the time frame I attempted to make improvements. Below are the thoughts and points that I added, addressed, and think would be potential future enhancements.
 
+The Favorites side sheet doesn't actually save anything or have the ability to add, the data is just mocked in for future enhancement idea.
+
+![Solace Advocates Application](https://link)
+
+
 ## Typescript
 
 - [x] Initially added the advocate interface -[x] Add several others to handle the added functionality, though did rely on some help from context for various typescript 'types'

@@ -43,15 +43,15 @@ export const SearchBar = ({
   );
   const [isSearching, setIsSearching] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const mountedRef = useRef(true);
+  const searchBarRef = useRef(true);
 
-  const searchTerm =
-    externalSearchTerm !== undefined ? externalSearchTerm : internalSearchTerm;
+  // Use external search term if provided, otherwise use internal state
+  const searchTerm = externalSearchTerm ?? internalSearchTerm;
 
   useEffect(() => {
-    mountedRef.current = true;
+    searchBarRef.current = true;
     return () => {
-      mountedRef.current = false;
+      searchBarRef.current = false;
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
@@ -72,7 +72,7 @@ export const SearchBar = ({
     }
 
     if (!searchTerm.trim()) {
-      if (mountedRef.current) {
+      if (searchBarRef.current) {
         setIsSearching(false);
         onSearchResults(advocates);
         if (onSearchClear) {
@@ -82,14 +82,14 @@ export const SearchBar = ({
       return;
     }
 
-    if (mountedRef.current) {
+    if (searchBarRef.current) {
       setIsSearching(true);
     }
 
     timeoutRef.current = setTimeout(() => {
-      if (!mountedRef.current) return;
+      if (!searchBarRef.current) return;
 
-      if (mountedRef.current) {
+      if (searchBarRef.current) {
         setIsSearching(false);
       }
     }, 300);
@@ -106,12 +106,12 @@ export const SearchBar = ({
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newTerm = event.target.value;
 
+    setInternalSearchTerm(newTerm);
+
     if (onSearchChange) {
       onSearchChange(newTerm);
     } else if (onSearchTermChange) {
       onSearchTermChange(newTerm);
-    } else {
-      setInternalSearchTerm(newTerm);
     }
   };
 
@@ -121,29 +121,22 @@ export const SearchBar = ({
       timeoutRef.current = null;
     }
 
-    if (mountedRef.current) {
-      setIsSearching(false);
-      if (onSearchChange) {
-        onSearchChange("");
-      } else if (onSearchTermChange) {
-        onSearchTermChange("");
-      } else {
-        setInternalSearchTerm("");
-      }
-      onSearchResults(advocates);
-      if (onSearchClear) {
-        onSearchClear();
-      }
-      if (onDegreeChange) {
-        onDegreeChange("");
-      }
-      if (onCityChange) {
-        onCityChange("");
-      }
-      if (onReset) {
-        onReset();
-      }
+    if (!searchBarRef.current) return;
+
+    setIsSearching(false);
+    setInternalSearchTerm("");
+
+    if (onSearchChange) {
+      onSearchChange("");
+    } else if (onSearchTermChange) {
+      onSearchTermChange("");
     }
+
+    onSearchResults(advocates);
+    onSearchClear?.();
+    onDegreeChange?.("");
+    onCityChange?.("");
+    onReset?.();
   };
 
   return (
@@ -187,7 +180,7 @@ export const SearchBar = ({
           {searchTerm.trim() ? `"${searchTerm}"` : "All advocates"}
         </span>
         {isSearching && (
-          <span className="ml-2 text-blue-500">Searching...</span>
+          <span className="ml-2 text-[#285e50]">Searching...</span>
         )}
       </div>
     </div>

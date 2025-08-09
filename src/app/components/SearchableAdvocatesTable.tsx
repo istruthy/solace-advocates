@@ -2,12 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { SearchBar } from "./SearchBar";
-import TableHeader from "@/app/components/TableHeader";
-import TableRow from "@/app/components/TableRow";
+import { TableHeader, TableRow, SearchBar, Chip } from "@/app/components/";
 import { Advocate } from "@/types/advocate";
 import { formatPhoneNumber } from "@/utils/phoneNumber";
-import { Chip } from "./Chip";
 
 interface SearchableAdvocatesTableProps {
   advocates: Advocate[];
@@ -125,6 +122,7 @@ export default function SearchableAdvocatesTable({
                 <TableHeader>Specialties</TableHeader>
                 <TableHeader>Experience</TableHeader>
                 <TableHeader widthClass="w-[12%]">Contact</TableHeader>
+                <TableHeader>{""}</TableHeader>
               </tr>
             </thead>
             <tbody>
@@ -155,6 +153,29 @@ export default function SearchableAdvocatesTable({
                   <TableRow>
                     {formatPhoneNumber(advocate.phoneNumber.toString()) ||
                       advocate.phoneNumber}
+                  </TableRow>
+                  <TableRow>
+                    <button
+                      className="text-gray-400 hover:text-[#285e50] transition-colors duration-200 p-1 rounded-full hover:bg-red-50"
+                      title="Add to favorites"
+                      onClick={() => {
+                        // TODO: Implement add to favorites functionality
+                        console.log(`Add advocate to favorites`);
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="size-5"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-11.25a.75.75 0 0 0-1.5 0v2.5h-2.5a.75.75 0 0 0 0 1.5h2.5v2.5a.75.75 0 0 0 1.5 0v-2.5h2.5a.75.75 0 0 0 0-1.5h-2.5v-2.5Z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
                   </TableRow>
                 </tr>
               ))}
