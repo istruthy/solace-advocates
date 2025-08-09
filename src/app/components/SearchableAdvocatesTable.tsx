@@ -7,6 +7,7 @@ import TableHeader from "@/app/components/TableHeader";
 import TableRow from "@/app/components/TableRow";
 import { Advocate } from "@/types/advocate";
 import { formatPhoneNumber } from "@/utils/phoneNumber";
+import { Chip } from "./Chip";
 
 interface SearchableAdvocatesTableProps {
   advocates: Advocate[];
@@ -122,7 +123,9 @@ export default function SearchableAdvocatesTable({
           <table className="w-full border-collapse">
             <thead>
               <tr className="bg-[#285e50]/10 h-10 border-b border-gray-300 text-[#285e50]">
-                <TableHeader textAlign="text-left" widthClass="w-[20%]">Advocate</TableHeader>
+                <TableHeader textAlign="text-left" widthClass="w-[20%]">
+                  Advocate
+                </TableHeader>
                 <TableHeader>Specialties</TableHeader>
                 <TableHeader>Experience</TableHeader>
                 <TableHeader widthClass="w-[12%]">Contact</TableHeader>
@@ -137,7 +140,8 @@ export default function SearchableAdvocatesTable({
                   <TableRow>
                     <div className="space-y-1">
                       <div className="font-medium text-gray-900">
-                        {advocate.firstName} {advocate.lastName}, {advocate.degree}
+                        {advocate.firstName} {advocate.lastName},{" "}
+                        {advocate.degree}
                       </div>
                       <div className="text-sm text-gray-600">
                         {advocate.city}
@@ -147,12 +151,7 @@ export default function SearchableAdvocatesTable({
                   <TableRow>
                     <div className="flex flex-wrap gap-1">
                       {advocate.specialties.map((specialty, index) => (
-                        <span
-                          key={index}
-                          className="bg-[rgba(67,130,113,0.5)] text-[rgba(67, 130, 113, 0.2)] text-xs px-2 py-1 rounded-2xl"
-                        >
-                          {specialty}
-                        </span>
+                        <Chip key={index}>{specialty}</Chip>
                       ))}
                     </div>
                   </TableRow>
