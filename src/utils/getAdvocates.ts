@@ -1,10 +1,12 @@
 import { Advocate } from "@/types/advocate";
+import { config } from "./config";
 
 const createErrorResponse = (
   page: number,
   limit: number,
   degree?: string,
   city?: string,
+  search?: string,
   error?: string,
   message?: string
 ) => ({
@@ -22,6 +24,7 @@ const createErrorResponse = (
   filters: {
     degree: degree || null,
     city: city || null,
+    search: search || null,
   },
   success: false,
   error: error || "Unknown error",
@@ -33,7 +36,8 @@ export const getAdvocates = async (
   page: number = 1,
   limit: number = 10,
   degree?: string,
-  city?: string
+  city?: string,
+  search?: string
 ) => {
   try {
     const params = new URLSearchParams({
@@ -49,9 +53,12 @@ export const getAdvocates = async (
       params.append("city", city);
     }
 
-    // TODO: can add caching here
+    if (search) {
+      params.append("search", search);
+    }
+
     const response = await fetch(
-      `http://localhost:3000/api/advocates?${params.toString()}`
+      `${config.apiUrl}/api/advocates?${params.toString()}`
     );
 
     if (!response.ok) {
@@ -61,13 +68,13 @@ export const getAdvocates = async (
         limit,
         degree,
         city,
+        search,
         `HTTP ${response.status}`
       );
     }
 
     const result = await response.json();
 
-    // Handle API error responses
     if (!result.success) {
       console.error("API returned error:", result.error);
       return createErrorResponse(
@@ -75,6 +82,7 @@ export const getAdvocates = async (
         limit,
         degree,
         city,
+        search,
         result.error,
         result.message
       );
@@ -98,6 +106,7 @@ export const getAdvocates = async (
       limit,
       degree,
       city,
+      search,
       "Network error",
       error instanceof Error ? error.message : "Failed to fetch advocates"
     );

@@ -14,6 +14,7 @@ interface SearchableAdvocatesTableProps {
   currentDegree?: string;
   cities?: string[];
   currentCity?: string;
+  currentSearch?: string;
 }
 
 export default function SearchableAdvocatesTable({
@@ -22,6 +23,7 @@ export default function SearchableAdvocatesTable({
   currentDegree,
   cities = [],
   currentCity,
+  currentSearch,
 }: SearchableAdvocatesTableProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -65,8 +67,15 @@ export default function SearchableAdvocatesTable({
     [updateParamsAndNavigate]
   );
 
+  const handleSearchChange = useCallback(
+    (search: string) => {
+      updateParamsAndNavigate({ search: search || null });
+    },
+    [updateParamsAndNavigate]
+  );
+
   const handleReset = useCallback(() => {
-    updateParamsAndNavigate({ degree: null, city: null });
+    updateParamsAndNavigate({ degree: null, city: null, search: null });
   }, [updateParamsAndNavigate]);
 
   const handleSearchResults = useCallback((results: Advocate[]) => {
@@ -85,6 +94,8 @@ export default function SearchableAdvocatesTable({
         cities={cities}
         currentCity={currentCity}
         onCityChange={handleCityChange}
+        currentSearch={currentSearch}
+        onSearchChange={handleSearchChange}
       />
 
       {advocates.length === 0 ? (
