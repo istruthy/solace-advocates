@@ -1,23 +1,22 @@
-import db from "@/db";
-import { advocates } from "@/db/schema";
-import { advocateData } from "@/db/seed/advocates";
+import { getDistinctDegrees } from "@/utils/degrees";
 
-export async function POST() {
+export async function GET() {
   try {
-    await db.insert(advocates).values(advocateData);
+    const degrees = await getDistinctDegrees();
 
     return Response.json({
-      message: "Database seeded successfully",
+      data: degrees,
       success: true,
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error("Error seeding database:", error);
+    console.error("Error fetching degrees:", error);
 
     return Response.json(
       {
-        error: "Failed to seed database",
+        error: "Failed to fetch degrees",
         message: error instanceof Error ? error.message : "Unknown error",
+        data: [],
         success: false,
         timestamp: new Date().toISOString(),
       },

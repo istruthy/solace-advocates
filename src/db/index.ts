@@ -8,6 +8,9 @@ const setup = () => {
       select: () => ({
         from: () => [],
       }),
+      insert: () => ({
+        values: () => [],
+      }),
     };
   }
 
