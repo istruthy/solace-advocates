@@ -13,11 +13,22 @@ const setup = () => {
       }),
     };
   }
-
-  // for query purposes
-  const queryClient = postgres(process.env.DATABASE_URL);
-  const db = drizzle(queryClient);
-  return db;
+// suggested by ai review
+  try {
+    const queryClient = postgres(process.env.DATABASE_URL);
+    const db = drizzle(queryClient);
+    return db;
+  } catch (error) {
+    console.error("Failed to initialize database:", error);
+    return {
+      select: () => ({
+        from: () => [],
+      }),
+      insert: () => ({
+        values: () => [],
+      }),
+    };
+  }
 };
 
 export default setup();

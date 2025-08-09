@@ -18,6 +18,8 @@ interface SearchBarProps {
   cities?: string[];
   currentCity?: string;
   onCityChange?: (city: string) => void;
+  currentSearch?: string;
+  onSearchChange?: (search: string) => void;
 }
 
 export const SearchBar = ({
@@ -33,12 +35,14 @@ export const SearchBar = ({
   cities = [],
   currentCity,
   onCityChange,
+  currentSearch,
+  onSearchChange,
 }: SearchBarProps) => {
   const [internalSearchTerm, setInternalSearchTerm] = useState(
-    externalSearchTerm || ""
+    externalSearchTerm || currentSearch || ""
   );
   const [isSearching, setIsSearching] = useState(false);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null); // this was a bit of a find
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const mountedRef = useRef(true);
 
   const searchTerm =
@@ -54,6 +58,12 @@ export const SearchBar = ({
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (currentSearch !== undefined) {
+      setInternalSearchTerm(currentSearch);
+    }
+  }, [currentSearch]);
 
   useEffect(() => {
     if (timeoutRef.current) {
@@ -79,24 +89,7 @@ export const SearchBar = ({
     timeoutRef.current = setTimeout(() => {
       if (!mountedRef.current) return;
 
-      const filtered = advocates.filter(advocate => {
-        const searchLower = searchTerm.toLowerCase();
-
-        return (
-          advocate.firstName.toLowerCase().includes(searchLower) ||
-          advocate.lastName.toLowerCase().includes(searchLower) ||
-          advocate.city.toLowerCase().includes(searchLower) ||
-          advocate.degree.toLowerCase().includes(searchLower) ||
-          advocate.specialties.some(specialty =>
-            specialty.toLowerCase().includes(searchLower)
-          ) ||
-          advocate.yearsOfExperience.toString().includes(searchLower) || // convert to string becuase db casts as number and did the same in the interface
-          advocate.phoneNumber.toString().includes(searchLower)
-        );
-      });
-
       if (mountedRef.current) {
-        onSearchResults(filtered);
         setIsSearching(false);
       }
     }, 300);
@@ -112,7 +105,10 @@ export const SearchBar = ({
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newTerm = event.target.value;
-    if (onSearchTermChange) {
+
+    if (onSearchChange) {
+      onSearchChange(newTerm);
+    } else if (onSearchTermChange) {
       onSearchTermChange(newTerm);
     } else {
       setInternalSearchTerm(newTerm);
@@ -127,7 +123,9 @@ export const SearchBar = ({
 
     if (mountedRef.current) {
       setIsSearching(false);
-      if (onSearchTermChange) {
+      if (onSearchChange) {
+        onSearchChange("");
+      } else if (onSearchTermChange) {
         onSearchTermChange("");
       } else {
         setInternalSearchTerm("");
@@ -136,7 +134,6 @@ export const SearchBar = ({
       if (onSearchClear) {
         onSearchClear();
       }
-      // Directly reset the filters
       if (onDegreeChange) {
         onDegreeChange("");
       }
@@ -155,7 +152,7 @@ export const SearchBar = ({
         <input
           type="text"
           placeholder="Search for your advocate"
-          className="border border-gray-300 rounded px-3 py-2 flex-1"
+          className="border border-gray-300 rounded focus:ring-[#285050] focus:border-[#285050] px-3 py-2 flex-1"
           value={searchTerm}
           onChange={handleSearchChange}
         />

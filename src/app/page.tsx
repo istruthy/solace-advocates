@@ -13,6 +13,7 @@ export default async function Home({
     limit?: string;
     degree?: string;
     city?: string;
+    search?: string;
   };
 }) {
   const page = Math.max(1, parseInt(searchParams.page || "1"));
@@ -22,6 +23,7 @@ export default async function Home({
   );
   const degree = searchParams.degree;
   const city = searchParams.city;
+  const search = searchParams.search;
 
   let result;
   let degrees: string[];
@@ -29,7 +31,7 @@ export default async function Home({
 
   try {
     [result, degrees, cities] = await Promise.all([
-      getAdvocates(page, limit, degree, city),
+      getAdvocates(page, limit, degree, city, search),
       getDegrees(),
       getDistinctCities(),
     ]);
@@ -51,7 +53,8 @@ export default async function Home({
       },
       filters: {
         degree: degree || null,
-        city: null,
+        city: city || null,
+        search: search || null,
       },
       success: false,
       error: "Page load error",
@@ -109,6 +112,7 @@ export default async function Home({
         currentDegree={degree}
         cities={cities}
         currentCity={city}
+        currentSearch={search}
       />
 
       {result.success && (
