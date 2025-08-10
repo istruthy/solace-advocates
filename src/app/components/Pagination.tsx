@@ -7,7 +7,7 @@ interface PaginationProps {
   totalPages: number;
   totalCount: number;
   limit: number;
-  onPageChange?: (page: number) => void;
+  onPageChange?: (_page: number) => void;
   baseUrl?: string;
 }
 

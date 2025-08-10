@@ -9,7 +9,6 @@ interface SearchSelectFieldProps extends Omit<SelectFieldProps, 'options'> {
 
 export const SearchSelectField = ({
   options,
-  allOptionsLabel = "All",
   placeholder,
   id,
   name,

@@ -19,7 +19,7 @@ export function SearchForm({
   currentCity,
   currentSearch,
 }: SearchFormProps) {
-  const { updateParams, clearParams, timeoutRef } = useUrlParams();
+  const { updateParams, timeoutRef } = useUrlParams();
 
   const [searchValue, setSearchValue] = useState(currentSearch || "");
   const [degreeValue, setDegreeValue] = useState(currentDegree || "");
@@ -59,13 +59,12 @@ export function SearchForm({
       clearTimeout(timeoutRef.current);
     }
 
-    // Clear search filters and reset to page 1, but preserve limit
     updateParams({
       search: null,
       degree: null,
       city: null,
-      page: "1" // Reset to first page
-    }, false); // Don't debounce the clear action
+      page: "1" 
+    }, false); 
   };
 
   useEffect(() => {
