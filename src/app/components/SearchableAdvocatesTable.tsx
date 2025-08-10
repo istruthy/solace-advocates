@@ -1,8 +1,4 @@
-"use client";
-
-import { useState, useEffect, useCallback } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { TableHeader, TableRow, SearchBar, Chip } from "@/app/components/";
+import { Chip, TableHeader, TableRow, SearchForm } from "@/app/components/";
 import { Advocate } from "@/types/advocate";
 import { formatPhoneNumber } from "@/utils/phoneNumber";
 
@@ -22,78 +18,18 @@ export default function SearchableAdvocatesTable({
   cities = [],
   currentCity,
   currentSearch,
+
 }: SearchableAdvocatesTableProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const [filteredAdvocates, setFilteredAdvocates] =
-    useState<Advocate[]>(advocates);
-
-  useEffect(() => {
-    setFilteredAdvocates(advocates);
-  }, [advocates]);
-
-  const updateParamsAndNavigate = useCallback(
-    (paramUpdates: Record<string, string | null>) => {
-      const params = new URLSearchParams(searchParams);
-
-      Object.entries(paramUpdates).forEach(([key, value]) => {
-        if (value === null) {
-          params.delete(key);
-        } else {
-          params.set(key, value);
-        }
-      });
-
-      params.set("page", "1");
-
-      router.replace(`?${params.toString()}`, { scroll: false });
-    },
-    [searchParams, router]
-  );
-
-  const handleDegreeChange = useCallback(
-    (degree: string) => {
-      updateParamsAndNavigate({ degree: degree || null });
-    },
-    [updateParamsAndNavigate]
-  );
-
-  const handleCityChange = useCallback(
-    (city: string) => {
-      updateParamsAndNavigate({ city: city || null });
-    },
-    [updateParamsAndNavigate]
-  );
-
-  const handleSearchChange = useCallback(
-    (search: string) => {
-      updateParamsAndNavigate({ search: search || null });
-    },
-    [updateParamsAndNavigate]
-  );
-
-  const handleReset = useCallback(() => {
-    updateParamsAndNavigate({ degree: null, city: null, search: null });
-  }, [updateParamsAndNavigate]);
-
-  const handleSearchResults = useCallback((results: Advocate[]) => {
-    setFilteredAdvocates(results);
-  }, []);
+  const filteredAdvocates = advocates;
 
   return (
     <div>
-      <SearchBar
-        advocates={advocates}
-        onSearchResults={handleSearchResults}
-        onReset={handleReset}
+      <SearchForm
         degrees={degrees}
         currentDegree={currentDegree}
-        onDegreeChange={handleDegreeChange}
         cities={cities}
         currentCity={currentCity}
-        onCityChange={handleCityChange}
         currentSearch={currentSearch}
-        onSearchChange={handleSearchChange}
       />
 
       {advocates.length === 0 ? (
@@ -158,10 +94,7 @@ export default function SearchableAdvocatesTable({
                     <button
                       className="text-gray-400 hover:text-[#285e50] transition-colors duration-200 p-1 rounded-full hover:bg-red-50"
                       title="Add to favorites"
-                      onClick={() => {
-                        // TODO: Implement add to favorites functionality
-                        console.log(`Add advocate to favorites`);
-                      }}
+                      type="button"
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

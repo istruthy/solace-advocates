@@ -1,50 +1,71 @@
 import db from "@/db";
 import { advocates } from "@/db/schema";
+import { createErrorResponse } from "@/utils/getAdvocates";
+import { PAGINATION_CONFIG } from "@/utils/constants";
 
-// Helper function to create default error response
-const createErrorResponse = (
-  page: number,
-  limit: number,
-  degree?: string,
-  city?: string,
-  search?: string,
-  error?: string,
-  message?: string
-) => ({
-  error: error || "Unknown error",
-  message: message || "Failed to fetch advocates",
-  data: [],
-  pagination: {
-    currentPage: page,
-    totalPages: 0,
-    totalCount: 0,
-    limit,
-    hasNextPage: false,
-    hasPreviousPage: false,
-    nextPage: null,
-    previousPage: null,
-  },
+const filterAdvocates = (
+  data: any[],
   filters: {
-    degree: degree || null,
-    city: city || null,
-    search: search || null,
-  },
-  success: false,
-  timestamp: new Date().toISOString(),
-});
+    degree?: string;
+    city?: string;
+    search?: string;
+  }
+) => {
+  const { degree, city, search } = filters;
+  
+  const degreeLower = degree?.toLowerCase();
+  const cityLower = city?.toLowerCase();
+  const searchLower = search?.toLowerCase();
+  
+  return data.filter(advocate => {
+    // Degree filter
+    if (degreeLower && !advocate.degree.toLowerCase().includes(degreeLower)) {
+      return false;
+    }
+    
+    if (cityLower && !advocate.city.toLowerCase().includes(cityLower)) {
+      return false;
+    }
+    
+    if (searchLower) {
+      const searchableText = [
+        advocate.firstName,
+        advocate.lastName,
+        advocate.city,
+        advocate.degree,
+        advocate.yearsOfExperience.toString(),
+        advocate.phoneNumber.toString(),
+        ...(Array.isArray(advocate.specialties) ? advocate.specialties : [])
+      ].join(' ').toLowerCase();
+      
+      if (!searchableText.includes(searchLower)) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+};
+
+const sortAdvocates = (data: any[]) => {
+  return data.sort((a, b) => {
+    const lastNameCompare = a.lastName.localeCompare(b.lastName);
+    return lastNameCompare !== 0 ? lastNameCompare : a.firstName.localeCompare(b.firstName);
+  });
+};
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
 
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
+    const page = Math.max(PAGINATION_CONFIG.MIN_LIMIT, parseInt(searchParams.get("page") || PAGINATION_CONFIG.DEFAULT_PAGE.toString()));
     const limit = Math.min(
-      Math.max(1, parseInt(searchParams.get("limit") || "10")),
-      100
+      Math.max(PAGINATION_CONFIG.MIN_LIMIT, parseInt(searchParams.get("limit") || PAGINATION_CONFIG.DEFAULT_LIMIT.toString())),
+      PAGINATION_CONFIG.MAX_LIMIT
     );
-    const degree = searchParams.get("degree");
-    const city = searchParams.get("city");
-    const search = searchParams.get("search");
+    const degree = searchParams.get("degree") || undefined;
+    const city = searchParams.get("city") || undefined;
+    const search = searchParams.get("search") || undefined;
 
     // Check if database is configured
     if (!db || typeof db.select !== "function") {
@@ -66,48 +87,15 @@ export async function GET(request: Request) {
       // Get all data first (for now, we'll implement proper filtering later)
       const allData = await db.select().from(advocates);
 
-      // Apply filters in memory for now
-      let filteredData = allData;
+      const filteredData = filterAdvocates(allData, { degree, city, search });
+      
+      const sortedData = sortAdvocates(filteredData);
 
-      if (degree) {
-        filteredData = filteredData.filter(advocate =>
-          advocate.degree.toLowerCase().includes(degree.toLowerCase())
-        );
-      }
-
-      if (city) {
-        filteredData = filteredData.filter(advocate =>
-          advocate.city.toLowerCase().includes(city.toLowerCase())
-        );
-      }
-
-      if (search) {
-        const searchLower = search.toLowerCase();
-        filteredData = filteredData.filter(advocate =>
-          advocate.firstName.toLowerCase().includes(searchLower) ||
-          advocate.lastName.toLowerCase().includes(searchLower) ||
-          advocate.city.toLowerCase().includes(searchLower) ||
-          advocate.degree.toLowerCase().includes(searchLower) ||
-          (Array.isArray(advocate.specialties) && 
-           advocate.specialties.some(specialty =>
-             specialty.toLowerCase().includes(searchLower)
-           )) ||
-          advocate.yearsOfExperience.toString().includes(searchLower) ||
-          advocate.phoneNumber.toString().includes(searchLower)
-        );
-      }
-
-      // Sort the data
-      filteredData.sort((a, b) => {
-        const lastNameCompare = a.lastName.localeCompare(b.lastName);
-        return lastNameCompare !== 0 ? lastNameCompare : a.firstName.localeCompare(b.firstName);
-      });
-
-      const totalCount = filteredData.length;
+      const totalCount = sortedData.length;
       const totalPages = Math.ceil(totalCount / limit);
       const startIndex = (page - 1) * limit;
       const endIndex = startIndex + limit;
-      const data = filteredData.slice(startIndex, endIndex);
+      const data = sortedData.slice(startIndex, endIndex);
 
       return Response.json({
         data,
@@ -150,8 +138,8 @@ export async function GET(request: Request) {
 
     return Response.json(
       createErrorResponse(
-        1,
-        10,
+        PAGINATION_CONFIG.DEFAULT_PAGE,
+        PAGINATION_CONFIG.DEFAULT_LIMIT,
         undefined,
         undefined,
         undefined,
