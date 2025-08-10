@@ -4,7 +4,6 @@
 
 export const FavoritesError = ({
   error,
-  reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;

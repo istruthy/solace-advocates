@@ -1,8 +1,8 @@
 import { Advocate } from "@/types/advocate";
+import { API_CONFIG, PAGINATION_CONFIG } from "./constants";
 
-const apiUrl = "http://localhost:3000";
 
-const createErrorResponse = (
+export const createErrorResponse = (
   page: number,
   limit: number,
   degree?: string,
@@ -34,8 +34,8 @@ const createErrorResponse = (
 });
 
 export const getAdvocates = async (
-  page: number = 1,
-  limit: number = 10,
+  page: number = PAGINATION_CONFIG.DEFAULT_PAGE,
+  limit: number = PAGINATION_CONFIG.DEFAULT_LIMIT,
   degree?: string,
   city?: string,
   search?: string
@@ -59,7 +59,7 @@ export const getAdvocates = async (
     }
 
     const response = await fetch(
-      `${apiUrl}/api/advocates?${params.toString()}`
+      `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ADVOCATES}?${params.toString()}`
     );
 
     if (!response.ok) {

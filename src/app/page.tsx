@@ -4,6 +4,7 @@ import { getAdvocates } from "@/utils/getAdvocates";
 import { getDegrees } from "@/utils/getDegrees";
 import { getDistinctCities } from "@/utils/getCities";
 import SearchableAdvocatesTable from "./components/SearchableAdvocatesTable";
+import { PAGINATION_CONFIG } from "@/utils/constants";
 
 export default async function Home({
   searchParams,
@@ -16,10 +17,10 @@ export default async function Home({
     search?: string;
   };
 }) {
-  const page = Math.max(1, parseInt(searchParams.page || "1"));
+  const page = Math.max(PAGINATION_CONFIG.MIN_LIMIT, parseInt(searchParams.page || PAGINATION_CONFIG.DEFAULT_PAGE.toString()));
   const limit = Math.min(
-    Math.max(1, parseInt(searchParams.limit || "10")),
-    100
+    Math.max(PAGINATION_CONFIG.MIN_LIMIT, parseInt(searchParams.limit || PAGINATION_CONFIG.DEFAULT_LIMIT.toString())),
+    PAGINATION_CONFIG.MAX_LIMIT
   );
   const degree = searchParams.degree;
   const city = searchParams.city;
@@ -38,7 +39,6 @@ export default async function Home({
   } catch (error) {
     console.error("Error loading page data:", error);
 
-    // Provide fallback data on error
     result = {
       data: [],
       pagination: {
