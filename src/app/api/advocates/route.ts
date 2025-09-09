@@ -9,6 +9,7 @@ const filterAdvocates = (
     degree?: string;
     city?: string;
     search?: string;
+    sort?: string;
   }
 ) => {
   const { degree, city, search } = filters;
@@ -16,6 +17,7 @@ const filterAdvocates = (
   const degreeLower = degree?.toLowerCase();
   const cityLower = city?.toLowerCase();
   const searchLower = search?.toLowerCase();
+
   
   return data.filter(advocate => {
     // Degree filter
@@ -47,12 +49,23 @@ const filterAdvocates = (
   });
 };
 
-const sortAdvocates = (data: any[]) => {
-  return data.sort((a, b) => {
-    const lastNameCompare = a.lastName.localeCompare(b.lastName);
-    return lastNameCompare !== 0 ? lastNameCompare : a.firstName.localeCompare(b.firstName);
-  });
+const sortAdvocates = (data: any[], sortParam?: string) => {
+
+  const [field, direction] = sortParam?.split(':') || ['advocate', 'asc'];
+  
+  if (field === 'advocate') {
+    const sortDirection = direction === 'desc' ? -1 : 1;
+    return data.sort((a, b) => {
+      const lastNameCompare = a.lastName.localeCompare(b.lastName);
+      const firstNameCompare = lastNameCompare !== 0 ? lastNameCompare : a.firstName.localeCompare(b.firstName);
+      return firstNameCompare * sortDirection;
+    });
+  }
+
+  return data;
 };
+
+
 
 export async function GET(request: Request) {
   try {
@@ -66,6 +79,7 @@ export async function GET(request: Request) {
     const degree = searchParams.get("degree") || undefined;
     const city = searchParams.get("city") || undefined;
     const search = searchParams.get("search") || undefined;
+    const sort = searchParams.get("sort") || undefined;
 
     // Check if database is configured
     if (!db || typeof db.select !== "function") {
@@ -76,6 +90,7 @@ export async function GET(request: Request) {
           degree || undefined,
           city || undefined,
           search || undefined,
+          sort || undefined,
           "Database not configured",
           "Please check your database configuration"
         ),
@@ -89,7 +104,7 @@ export async function GET(request: Request) {
 
       const filteredData = filterAdvocates(allData, { degree, city, search });
       
-      const sortedData = sortAdvocates(filteredData);
+      const sortedData = sortAdvocates(filteredData, sort);
 
       const totalCount = sortedData.length;
       const totalPages = Math.ceil(totalCount / limit);
@@ -113,6 +128,7 @@ export async function GET(request: Request) {
           degree: degree || null,
           city: city || null,
           search: search || null,
+          sort: sort || null,
         },
         success: true,
         timestamp: new Date().toISOString(),
@@ -127,6 +143,7 @@ export async function GET(request: Request) {
           degree || undefined,
           city || undefined,
           search || undefined,
+          sort || undefined,
           "Database connection failed",
           "Unable to connect to the database. Please try again later."
         ),
