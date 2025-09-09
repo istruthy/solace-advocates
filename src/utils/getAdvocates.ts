@@ -8,6 +8,7 @@ export const createErrorResponse = (
   degree?: string,
   city?: string,
   search?: string,
+  sort?: "asc" | "desc" | undefined,
   error?: string,
   message?: string
 ) => ({
@@ -26,6 +27,7 @@ export const createErrorResponse = (
     degree: degree || null,
     city: city || null,
     search: search || null,
+    sort: sort || null,
   },
   success: false,
   error: error || "Unknown error",
@@ -38,7 +40,8 @@ export const getAdvocates = async (
   limit: number = PAGINATION_CONFIG.DEFAULT_LIMIT,
   degree?: string,
   city?: string,
-  search?: string
+  search?: string,
+  sort?: string
 ) => {
   try {
     const params = new URLSearchParams({
@@ -57,6 +60,9 @@ export const getAdvocates = async (
     if (search) {
       params.append("search", search);
     }
+    if (sort) {
+      params.append("sort", sort);
+    }
 
     const response = await fetch(
       `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.ADVOCATES}?${params.toString()}`
@@ -66,10 +72,11 @@ export const getAdvocates = async (
       console.error(`Error fetching advocates: ${response.status}`);
       return createErrorResponse(
         page,
-        limit,
+        limit,  
         degree,
         city,
         search,
+        sort as "desc" | "asc" | undefined,
         `HTTP ${response.status}`
       );
     }
@@ -84,6 +91,7 @@ export const getAdvocates = async (
         degree,
         city,
         search,
+        sort as "desc" | "asc" | undefined,
         result.error,
         result.message
       );
@@ -108,6 +116,7 @@ export const getAdvocates = async (
       degree,
       city,
       search,
+      sort as "desc" | "asc" | undefined,
       "Network error",
       error instanceof Error ? error.message : "Failed to fetch advocates"
     );
