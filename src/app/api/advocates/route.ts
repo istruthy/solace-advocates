@@ -9,7 +9,7 @@ const filterAdvocates = (
     degree?: string;
     city?: string;
     search?: string;
-    sort?: string;
+    sort?: "asc" | "desc" | undefined;
   }
 ) => {
   const { degree, city, search } = filters;
@@ -56,7 +56,7 @@ const sortAdvocates = (data: any[], sortParam?: string) => {
   if (field === 'advocate') {
     const sortDirection = direction === 'desc' ? -1 : 1;
     return data.sort((a, b) => {
-      const lastNameCompare = a.lastName.localeCompare(b.lastName);
+      const lastNameCompare = a?.lastName.localeCompare(b?.lastName);
       return lastNameCompare * sortDirection;
     });
   }
@@ -89,8 +89,8 @@ export async function GET(request: Request) {
           degree || undefined,
           city || undefined,
           search || undefined,
-          sort || undefined,
-          "Database not configured",
+          sort as "desc" | "asc" | undefined,
+          "Database not configured", 
           "Please check your database configuration"
         ),
         { status: 503 }
@@ -142,7 +142,7 @@ export async function GET(request: Request) {
           degree || undefined,
           city || undefined,
           search || undefined,
-          sort || undefined,
+          sort as "desc" | "asc" | undefined,
           "Database connection failed",
           "Unable to connect to the database. Please try again later."
         ),
@@ -159,6 +159,7 @@ export async function GET(request: Request) {
         undefined,
         undefined,
         undefined,
+        undefined as "desc" | "asc" | undefined,
         "Failed to fetch advocates",
         error instanceof Error ? error.message : "Unknown error"
       ),

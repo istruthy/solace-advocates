@@ -72,11 +72,11 @@ export const getAdvocates = async (
       console.error(`Error fetching advocates: ${response.status}`);
       return createErrorResponse(
         page,
-        limit,
+        limit,  
         degree,
         city,
         search,
-        sort,
+        sort as "desc" | "asc" | undefined,
         `HTTP ${response.status}`
       );
     }
@@ -91,7 +91,7 @@ export const getAdvocates = async (
         degree,
         city,
         search,
-        sort,
+        sort as "desc" | "asc" | undefined,
         result.error,
         result.message
       );
@@ -116,7 +116,7 @@ export const getAdvocates = async (
       degree,
       city,
       search,
-      sort,
+      sort as "desc" | "asc" | undefined,
       "Network error",
       error instanceof Error ? error.message : "Failed to fetch advocates"
     );
