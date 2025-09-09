@@ -8,7 +8,7 @@ export const createErrorResponse = (
   degree?: string,
   city?: string,
   search?: string,
-  sort?: string,
+  sort?: "asc" | "desc" | undefined,
   error?: string,
   message?: string
 ) => ({
