@@ -57,8 +57,7 @@ const sortAdvocates = (data: any[], sortParam?: string) => {
     const sortDirection = direction === 'desc' ? -1 : 1;
     return data.sort((a, b) => {
       const lastNameCompare = a.lastName.localeCompare(b.lastName);
-      const firstNameCompare = lastNameCompare !== 0 ? lastNameCompare : a.firstName.localeCompare(b.firstName);
-      return firstNameCompare * sortDirection;
+      return lastNameCompare * sortDirection;
     });
   }
 
